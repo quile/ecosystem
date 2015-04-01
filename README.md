@@ -2,7 +2,7 @@
 
 ## Managed lifecycle and dependency injection for your application components
 
-Node.js can be a bit of wild west when it comes to organising your
+Node.js can be a bit like the wild west when it comes to organising your
 application structure.  Although 'require' goes a long way toward
 helping you have a good layout, it is not particularly useful when
 it comes to questions of application lifecycle.  That's where this
@@ -40,10 +40,11 @@ their _lifecycle_ behaviours:
 * dependencies() - return an array of names of modules that this module
 depends on.  The dependencies will be initialised before this module.
 
-* init(next) - this will be invoked if present on your module, allowing
-your component to initialise itself from config values, set up various
-parameters, and so on.  This will only be called once.  You *must* call
-the next() function when you are done, or the init call-chain will terminate.
+* init(config, modules, next) - this will be invoked if present on
+your module, allowing your component to initialise itself from 
+config values, set up various parameters, and so on.  This will 
+only be called once.  You *must* call the next() function when you 
+are done, or the init call-chain will terminate.
 
 * start(next) - here you can actually start your service, connect to a
 database, set up timers, etc.  When you are done, you must invoke the
@@ -55,4 +56,4 @@ You must call next() or the stop call-chain will terminate.
 
 ## Example
 
-
+tbd.

@@ -155,23 +155,20 @@ _.extend(Lifecycle.prototype, {
     },
 
     _lifecycle_whenAll: function(modules, selector, args, next) {
-        var count = 0;
-        var total = _(modules).keys().length;
-        if (total === 0) {
-            return next();
-        }
-        var countFunction = function() {
-            count++;
-            if (count === total) {
-                next();
+        var self = this;
+        var _mods = _(modules).clone();
+
+        var _drain = function() {
+            var mod = _mods.shift();
+            if (!mod) {
+                return next();
+            }
+            if (_.isFunction(mod[selector])) {
+                mod[selector].apply(mod, args);
             }
         };
-        args.push(countFunction);
-        _(modules).each(function(m) {
-            if (m[selector] && _.isFunction(m[selector])) {
-                m[selector].apply(m, args);
-            }
-        });
+        args.push(_drain);
+        _drain();
     },
 
     lifecycleStatus: function() {
