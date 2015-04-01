@@ -81,7 +81,7 @@ _.extend(Lifecycle.prototype, {
                     next();
                 };
                 if (_.isFunction(self.init)) {
-                    self.init(forward);
+                    self.init(config, all, forward);
                 } else {
                     forward();
                 }

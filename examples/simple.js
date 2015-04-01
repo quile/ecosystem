@@ -15,7 +15,7 @@ _.extend(Foo.prototype, {
         return [];
     },
 
-    init: function(next) {
+    init: function(config, all, next) {
         console.log("Foo init");
         next();
     },
@@ -42,7 +42,7 @@ _.extend(Bar.prototype, {
         return [ 'foo' ];
     },
 
-    init: function(next) {
+    init: function(config, all, next) {
         console.log("Bar init");
         next();
     },
@@ -69,7 +69,7 @@ _.extend(Baz.prototype, {
         return [ 'foo', 'bar' ];
     },
 
-    init: function(next) {
+    init: function(config, all, next) {
         console.log("Baz init");
         next();
     },
