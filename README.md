@@ -34,6 +34,11 @@ lifecycle methods.
     util.inherits(MyService, Lifecycle);
     ...
 
+    module.exports = {
+        Lifecycle: MyService,
+        ...
+    };
+
 There are four methods that your modules can override to implement
 their _lifecycle_ behaviours:
 
@@ -53,7 +58,3 @@ next() function in order for the start call-chain to continue.
 * stop(next) - This will be called when the service is being stopped. Note
 that a service will only be stopped after all its dependencies are stopped.
 You must call next() or the stop call-chain will terminate.
-
-## Example
-
-tbd.
