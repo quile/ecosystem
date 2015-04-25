@@ -47,6 +47,10 @@ _.extend(Lifecycle.prototype, {
         return m;
     },
 
+    dependency: function(name) {
+        return this.lifecycle_dependency(name);
+    },
+
     _wrap: function(selector) {
 
     },
@@ -55,9 +59,7 @@ _.extend(Lifecycle.prototype, {
         var self = this;
 
         if (self.lifecycleStatus() === lifecycle.STATUS_INITIALISING) {
-            // error?
-            console.error("Error: circular dependency discovered.");
-            return;
+            throw new Error("Error: circular dependency discovered.");
         }
 
         if (self.lifecycleStatus() === lifecycle.STATUS_INITIALISED) {
@@ -67,7 +69,7 @@ _.extend(Lifecycle.prototype, {
 
         self._lifecycle_resolveDependencies(all);
 
-        console.log("Initialising " + self._lifecycle_name);
+        // console.log("Initialising " + self._lifecycle_name);
         self.setLifecycleStatus(lifecycle.STATUS_INITIALISING);
 
         self._lifecycle_whenAll(_(self._lifecycle.dependencies).values(),
@@ -77,7 +79,7 @@ _.extend(Lifecycle.prototype, {
                 var forward = function() {
                     self.setLifecycleStatus(lifecycle.STATUS_INITIALISED);
                     self.emit("init");
-                    console.log("Initialised " + self._lifecycle_name);
+                    // console.log("Initialised " + self._lifecycle_name);
                     next();
                 };
                 if (_.isFunction(self.init)) {
@@ -95,7 +97,7 @@ _.extend(Lifecycle.prototype, {
             // already started, we can continue
             return next();
         }
-        console.log("Starting " + self._lifecycle_name);
+        // console.log("Starting " + self._lifecycle_name);
         self.setLifecycleStatus(lifecycle.STATUS_STARTING);
 
         self._lifecycle_whenAll(_(self._lifecycle.dependencies).values(),
@@ -104,7 +106,7 @@ _.extend(Lifecycle.prototype, {
                 var forward = function () {
                     self.setLifecycleStatus(lifecycle.STATUS_STARTED);
                     self.emit("start");
-                    console.log("Started " + self._lifecycle_name);
+                    // console.log("Started " + self._lifecycle_name);
                     next();
                 };
                 if (_.isFunction(self.start)) {
@@ -121,7 +123,7 @@ _.extend(Lifecycle.prototype, {
         if (self.lifecycleStatus() === lifecycle.STATUS_STOPPED) {
             return next();
         }
-        console.log("Stopping " + self._lifecycle_name);
+        // console.log("Stopping " + self._lifecycle_name);
         self.setLifecycleStatus(lifecycle.STATUS_STOPPING);
 
         self._lifecycle_whenAll(_(self._lifecycle.dependencies).values(),
@@ -130,7 +132,7 @@ _.extend(Lifecycle.prototype, {
                 var forward = function() {
                     self.setLifecycleStatus(lifecycle.STATUS_STOPPED);
                     self.emit("stop");
-                    console.log("Stopped " + self._lifecycle_name);
+                    // console.log("Stopped " + self._lifecycle_name);
                     next();
                 };
                 if (_.isFunction(self.stop)) {

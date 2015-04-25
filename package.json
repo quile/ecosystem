@@ -1,11 +1,11 @@
 {
   "name": "lifecycle",
-  "version": "0.0.1",
-  "description": "Simple, asynchronous dependency injection and lifecycle control.",
+  "version": "0.0.2",
+  "description": "Simple, awesome, asynchronous dependency injection and lifecycle control.",
   "author": "Kyle Dawkins <kdawkins@fastmail.fm>",
   "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
