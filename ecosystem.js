@@ -56,10 +56,6 @@ _.extend(Lifecycle.prototype, {
         return this.lifecycle_dependency(name);
     },
 
-    _wrap: function(selector) {
-
-    },
-
     _init: function(config, all, next) {
         var self = this;
 
@@ -95,6 +91,7 @@ _.extend(Lifecycle.prototype, {
             }
         );
     },
+
     _start: function(next) {
         var self = this;
 
@@ -122,6 +119,7 @@ _.extend(Lifecycle.prototype, {
             }
         );
     },
+
     _stop: function(next) {
         var self = this;
 
