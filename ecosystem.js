@@ -1,3 +1,8 @@
+// =================================================
+// ecosystem - lifecycle control and dependency
+// injection for node.js apps.  This will help you.
+// =================================================
+
 var util   = require("util");
 var events = require("events");
 var _      = require("underscore");
