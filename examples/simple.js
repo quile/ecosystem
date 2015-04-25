@@ -1,14 +1,14 @@
 var util = require("util");
 var _    = require("underscore");
 
-var lifecycle = require("../lifecycle");
+var ecosystem = require("../ecosystem");
 
 
 function Foo(name) {
-    lifecycle.Lifecycle.call(this, name);
+    ecosystem.Lifecycle.call(this, name);
 }
 
-util.inherits(Foo, lifecycle.Lifecycle);
+util.inherits(Foo, ecosystem.Lifecycle);
 
 _.extend(Foo.prototype, {
     dependencies: function() {
@@ -32,10 +32,10 @@ _.extend(Foo.prototype, {
 });
 
 function Bar(name) {
-    lifecycle.Lifecycle.call(this, name);
+    ecosystem.Lifecycle.call(this, name);
 }
 
-util.inherits(Bar, lifecycle.Lifecycle);
+util.inherits(Bar, ecosystem.Lifecycle);
 
 _.extend(Bar.prototype, {
     dependencies: function() {
@@ -59,13 +59,13 @@ _.extend(Bar.prototype, {
 });
 
 function Baz(name) {
-    lifecycle.Lifecycle.call(this, name);
+    ecosystem.Lifecycle.call(this, name);
 }
 
-util.inherits(Baz, lifecycle.Lifecycle);
+util.inherits(Baz, ecosystem.Lifecycle);
 
 _.extend(Baz.prototype, {
-    lifecycle_dependencies: function() {
+    ecosystem_dependencies: function() {
         return [ 'foo', 'bar' ];
     },
 

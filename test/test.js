@@ -1,7 +1,7 @@
 var assert    = require("assert");
 var util      = require("util");
 var _         = require("underscore");
-var lifecycle = require("../lifecycle");
+var lifecycle = require("../ecosystem");
 
 describe("plain module", function() {
     it("creates and starts a single module", function(done) {

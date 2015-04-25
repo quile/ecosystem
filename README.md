@@ -1,4 +1,4 @@
-# lifecycle
+# ecosystem
 
 ## Managed lifecycle and dependency injection for your application components
 
@@ -25,7 +25,7 @@ Using it is a simple matter of having an object that inherits
 from the *Lifecycle* class, and, if you want, overriding any of the
 lifecycle methods.
 
-    var Lifecycle = require("lifecycle").Lifecycle;
+    var Lifecycle = require("ecosystem").Lifecycle;
     var util      = require("util");
 
     function MyService(name) {
