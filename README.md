@@ -25,6 +25,7 @@ Using it is a simple matter of having an object that inherits
 from the *Lifecycle* class, and, if you want, overriding any of the
 lifecycle methods.
 
+```javascript
     var Lifecycle = require("ecosystem").Lifecycle;
     var util      = require("util");
 
@@ -42,6 +43,7 @@ lifecycle methods.
         Lifecycle: MyService,
         ...
     };
+```
 
 There are four methods that your modules can override to implement
 their _lifecycle_ behaviours:
@@ -67,33 +69,43 @@ You must call next() or the stop call-chain will terminate.
 
 1. Build a dictionary of name-to-component mappings:
 
+```javascript
         var modules = {
             foo: InstanceOfFoo,
             bar: InstanceOfBar,
             ...
         };
+```
 
 2. Initialise them all this way:
 
+```javascript
         ecosystem.initAll(config, modules, function() {
             // this will be called when all modules have been initialised
         });
+```
 
 3. Start them all
 
+```javascript
             ecosystem.startAll(modules, function() {
                 // this will be called when all modules
                 // have been successfully started
             });
+```
 
 4. Stop them when you're done
+
+```javascript
                 ecosystem.stopAll(modules, function() {
                     // This will be called when all
                     // modules have been stopped.
                 });
+```
 
 So all together:
 
+```javascript
     ecosystem.initAll(config, modules, function() {
         // this will be called when all modules have been initialised
         ecosystem.startAll(modules, function() {
@@ -105,6 +117,7 @@ So all together:
             });
         });
     });
+```
 
 Note that the config should only be passed into the initAll()
 function; modules can take what they need from the config during
@@ -115,12 +128,15 @@ initialisation.
 
 Here's an example MySQL service that other modules can declare as a dependency.
 Then all dependent modules can be assured that when their start() method is called,
-this service's start() method has already been called.
+this service's start() method has already been called.  You can find this example in
+the examples/mysql directory.
 
-    var mysql = require('mysql');
-    var util  = require('util');
+```javascript
+    var mysql = require("mysql");
+    var util  = require("util");
+    var _     = require("underscore");
 
-    var Lifecycle = require('ecosystem').Lifecycle;
+    var Lifecycle = require("ecosystem").Lifecycle;
 
     // Construct the service
     function MySQL(name) {
@@ -155,7 +171,7 @@ this service's start() method has already been called.
 
             this._connection.connect(function(err) {
                 if (err) {
-                    log.error(err);
+                    console.error(err);
                     throw new Error(err);
                 }
                 console.log("MySQL connected.");
@@ -177,7 +193,102 @@ this service's start() method has already been called.
     module.exports = {
         Lifecycle: MySQL
     };
+```
 
+Now you can use this service from your other code:
+
+```javascript
+    var _         = require("underscore");
+    var util      = require("util");
+    var Lifecycle = require("ecosystem").Lifecycle;
+    
+    function FooService(name) {
+        Lifecycle.call(this, name);
+        ...
+    }
+
+    util.inherits(FooService, Lifecycle);
+
+    _.extend(FooService.prototype, {
+
+        dependencies: function() {
+            return [ "mysql" ];
+        },
+
+        init: function(config, modules, next) {
+            console.log("Foo service initialised");
+            next();
+        },
+
+        start: function(next) {
+            // Here we are guaranteed to have a live mysql
+            // connection (assuming nothing went wrong).
+            var mysql = this.dependency("mysql");
+            mysql.doSomeStuff(function() {
+                next();
+            });
+        },
+
+        ... More FooService stuff here
+    });
+
+    module.exports = {
+        Lifecycle: FooService
+    };
+```
+
+In your FooService's start() method, you can see that it can access
+its "mysql" dependency by name, and then call methods on it.  The MySQL
+service's start() method will have already been called and if all went
+well, the connection will be live and ready.
+
+There are many ways to start all your services, but here's one easy way
+to do it:
+
+```javascript
+    // app.js
+    var ecosystem = require("ecosystem");
+
+    // Presumably you'd pull this in from a file or something:
+    var config = {
+        mysql: {
+            host: "localhost",
+            user: "sneelock",
+            password: ...
+            database: "circus"
+        },
+        ...
+    };
+    
+    var moduleNames = [
+        './mysql',
+        './foo',
+    ];
+
+    // This convenience will "require" all the listed
+    // modules and create uninitialised instances of
+    // all of them.  You don't have to use this but it
+    // saves a lot of boilerplate.
+    var modules = ecosystem.loadAll(moduleNames);
+
+    // This is a standard pattern to initialise your
+    // modules first, then once that succeeds, you
+    // can start them all.
+    ecosystem.initAll(config, modules, function() {
+        ecosystem.startAll(modules, function() {
+            console.log("All modules started.");
+        });
+    });
+
+    // Trap termination signals and close gracefully
+    function terminate() {
+        console.log('Shutting down...');
+        ecosystem.stopAll(modules);
+        setTimeout(process.exit, 2000);
+    }
+    process.on('SIGINT', terminate);
+    process.on('SIGTERM', terminate);
+```
 
 ## TODO
 

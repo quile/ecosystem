@@ -5,6 +5,7 @@
 
 var util   = require("util");
 var events = require("events");
+var path   = require("path");
 var _      = require("underscore");
 
 var lifecycle = {
@@ -187,9 +188,13 @@ _.extend(Lifecycle.prototype, {
 
 var self = {
 
-    _load: function(moduleName) {
+    _load: function(moduleName, root) {
+        var canonical = moduleName;
+        if (root) {
+            canonical = path.resolve(root, moduleName);
+        }
         // later allow for more advanced path searching, maybe?
-        var _m = require(moduleName);
+        var _m = require(canonical);
         if (!_m || !_m.Lifecycle) {
             log.error('Failed to load %s', moduleName);
             throw('Failed to load ' + moduleName);
@@ -197,10 +202,10 @@ var self = {
         return _m;
     },
 
-    loadAll: function(moduleNames) {
+    loadAll: function(moduleNames, root) {
         var modules = {};
         _(moduleNames).each(function(name) {
-            var _m = self._load(name);
+            var _m = self._load(name, root);
             modules[name] = new _m.Lifecycle(name);
         });
         return modules;
