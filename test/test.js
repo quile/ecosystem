@@ -1,14 +1,14 @@
 var assert    = require("assert");
 var util      = require("util");
 var _         = require("underscore");
-var lifecycle = require("../ecosystem");
+var ecosystem = require("../ecosystem");
 
 describe("plain module", function() {
     it("creates and starts a single module", function(done) {
-        var Test = function(name) {lifecycle.Lifecycle.call(this, name);};
-        util.inherits(Test, lifecycle.Lifecycle);
+        var Test = function(name) {ecosystem.Lifecycle.call(this, name);};
+        util.inherits(Test, ecosystem.Lifecycle);
         var test = new Test("test");
-        test._init({}, {}, function() {
+        ecosystem.initAll({}, { test: test }, function() {
             done();
         });
     })
@@ -16,17 +16,17 @@ describe("plain module", function() {
 
 describe("simple dependency", function() {
     it("creates and starts two dependent modules", function(done) {
-        var TestA = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestB = function(name) {lifecycle.Lifecycle.call(this, name);};
-        util.inherits(TestA, lifecycle.Lifecycle);
-        util.inherits(TestB, lifecycle.Lifecycle);
+        var TestA = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestB = function(name) {ecosystem.Lifecycle.call(this, name);};
+        util.inherits(TestA, ecosystem.Lifecycle);
+        util.inherits(TestB, ecosystem.Lifecycle);
         _.extend(TestA.prototype, {
             dependencies: function() { return [ "testb" ] }
         });
         var testa = new TestA("testa");
         var testb = new TestB("testb");
 
-        testa._init({}, { testa: testa, testb: testb }, function() {
+        ecosystem.initAll({}, { testa: testa, testb: testb }, function() {
             done();
         });
     });
@@ -34,16 +34,16 @@ describe("simple dependency", function() {
 
 describe("complex dependencies", function() {
     it("sets up a dependency tree correctly", function(done) {
-        var TestA = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestB = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestC = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestD = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestE = function(name) {lifecycle.Lifecycle.call(this, name);};
-        util.inherits(TestA, lifecycle.Lifecycle);
-        util.inherits(TestB, lifecycle.Lifecycle);
-        util.inherits(TestC, lifecycle.Lifecycle);
-        util.inherits(TestD, lifecycle.Lifecycle);
-        util.inherits(TestE, lifecycle.Lifecycle);
+        var TestA = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestB = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestC = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestD = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestE = function(name) {ecosystem.Lifecycle.call(this, name);};
+        util.inherits(TestA, ecosystem.Lifecycle);
+        util.inherits(TestB, ecosystem.Lifecycle);
+        util.inherits(TestC, ecosystem.Lifecycle);
+        util.inherits(TestD, ecosystem.Lifecycle);
+        util.inherits(TestE, ecosystem.Lifecycle);
         _.extend(TestA.prototype, { dependencies: function() { return [ "testb" ] }});
         _.extend(TestB.prototype, { dependencies: function() { return [ "testc", "testd" ] }});
         _.extend(TestD.prototype, { dependencies: function() { return [ "teste" ] }});
@@ -61,7 +61,7 @@ describe("complex dependencies", function() {
             teste: teste
         };
 
-        testa._init({}, modules, function() {
+        ecosystem.initAll({}, modules, function() {
             assert.equal(testa.dependency("testb"), testb);
             assert.equal(testb.dependency("testc"), testc);
             assert.equal(testb.dependency("testd"), testd);
@@ -73,10 +73,10 @@ describe("complex dependencies", function() {
 
 describe("circular dependencies", function() {
     it("throws when a circular dependency is found", function() {
-        var TestA = function(name) {lifecycle.Lifecycle.call(this, name);};
-        var TestB = function(name) {lifecycle.Lifecycle.call(this, name);};
-        util.inherits(TestA, lifecycle.Lifecycle);
-        util.inherits(TestB, lifecycle.Lifecycle);
+        var TestA = function(name) {ecosystem.Lifecycle.call(this, name);};
+        var TestB = function(name) {ecosystem.Lifecycle.call(this, name);};
+        util.inherits(TestA, ecosystem.Lifecycle);
+        util.inherits(TestB, ecosystem.Lifecycle);
         _.extend(TestA.prototype, { dependencies: function() { return [ "testb" ] }});
         _.extend(TestB.prototype, { dependencies: function() { return [ "testa" ] }});
         var testa = new TestA("testa");
@@ -84,7 +84,7 @@ describe("circular dependencies", function() {
 
         assert.throws(
             function() {
-                testa._init({}, { testa: testa, testb: testb }, function() {});
+                ecosystem.initAll({}, { testa: testa, testb: testb }, function() {});
             },
             function(err) {
                 if (err instanceof Error && /circular/.test(err)) {
@@ -98,8 +98,8 @@ describe("circular dependencies", function() {
 
 describe("init, start and stop", function() {
     it("calls init, start and stop on the module", function(done) {
-        var TestA = function(name) {lifecycle.Lifecycle.call(this, name);};
-        util.inherits(TestA, lifecycle.Lifecycle);
+        var TestA = function(name) {ecosystem.Lifecycle.call(this, name);};
+        util.inherits(TestA, ecosystem.Lifecycle);
         _.extend(TestA.prototype, {
             init: function(config, modules, next) {
                 this._initCalled = true;
@@ -115,10 +115,10 @@ describe("init, start and stop", function() {
             }
         });
         var testa = new TestA("testa");
-
-        testa._init({}, {}, function() {
-            testa._start(function() {
-                testa._stop(function() {
+        var modules = { testa: testa };
+        ecosystem.initAll({}, modules, function() {
+            ecosystem.startAll(modules, function() {
+                ecosystem.stopAll(modules, function() {
                     assert(testa._initCalled);
                     assert(testa._startCalled);
                     assert(testa._stopCalled);

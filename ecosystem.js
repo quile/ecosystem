@@ -185,6 +185,63 @@ _.extend(Lifecycle.prototype, {
     },
 });
 
+var self = {
+
+    _load: function(moduleName) {
+        // later allow for more advanced path searching, maybe?
+        var _m = require(moduleName);
+        if (!_m || !_m.Lifecycle) {
+            log.error('Failed to load %s', moduleName);
+            throw('Failed to load ' + moduleName);
+        }
+        return _m;
+    },
+
+    loadAll: function(moduleNames) {
+        var modules = {};
+        _(moduleNames).each(function(name) {
+            var _m = self._load(name);
+            modules[name] = new _m.Lifecycle(name);
+        });
+        return modules;
+    },
+
+    initAll: function(config, modules, next) {
+        var _modules = _(modules).values();
+        var _init = function() {
+            var m = _modules.shift();
+            if (!m) { return next() }
+            m._init(config, modules, _init);
+        };
+        _init();
+        return self;
+    },
+
+    startAll: function(modules, next) {
+        next = next || function() {};
+        var _modules = _(modules).values();
+        var _start = function() {
+            var m = _modules.shift();
+            if (!m) { return next() }
+            m._start(_start);
+        };
+        _start();
+        return self;
+    },
+
+    stopAll: function(modules, next) {
+        next = next || function() {};
+        var _modules = _(modules).values();
+        var _stop = function() {
+            var m = _modules.shift();
+            if (!m) { return next() }
+            m._stop(_stop);
+        };
+        _stop();
+        return self;
+    }
+};
+
 module.exports = _.extend({
     Lifecycle: Lifecycle,
-}, lifecycle);
+}, self, lifecycle);

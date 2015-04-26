@@ -90,11 +90,12 @@ var foo = new Foo("foo");
 var bar = new Bar("bar");
 var baz = new Baz("baz");
 
-baz._init({}, { foo: foo, bar: bar, baz: baz }, function() {
+var modules = { foo: foo, bar: bar, baz: baz };
+ecosystem.initAll({}, modules, function() {
     console.log("Finished initialising.");
-    baz._start(function() {
+    ecosystem.startAll(modules, function() {
         console.log("Finished starting.");
-        baz._stop(function() {
+        ecosystem.stopAll(modules, function() {
             console.log("Finished stopping.");
         });
     });
