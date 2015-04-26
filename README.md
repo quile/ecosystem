@@ -46,9 +46,9 @@ their _lifecycle_ behaviours:
 depends on.  The dependencies will be initialised before this module.
 
 * init(config, modules, next) - this will be invoked if present on
-your module, allowing your component to initialise itself from 
-config values, set up various parameters, and so on.  This will 
-only be called once.  You *must* call the next() function when you 
+your module, allowing your component to initialise itself from
+config values, set up various parameters, and so on.  This will
+only be called once.  You *must* call the next() function when you
 are done, or the init call-chain will terminate.
 
 * start(next) - here you can actually start your service, connect to a
@@ -58,3 +58,15 @@ next() function in order for the start call-chain to continue.
 * stop(next) - This will be called when the service is being stopped. Note
 that a service will only be stopped after all its dependencies are stopped.
 You must call next() or the stop call-chain will terminate.
+
+## TODO
+
+* Write some decent documentation
+* Build a simpler way to kick off the modules, rather than having to call _init by hand.
+* Show some real-world examples
+
+## Acknowledgements
+
+This is loosely based on the awesome Clojure project,
+[component](https://github.com/stuartsierra/component),
+by Stuart Sierra.
