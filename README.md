@@ -63,30 +63,30 @@ You must call next() or the stop call-chain will terminate.
 
 1. Build a dictionary of name-to-component mappings:
 
-    var modules = {
-        foo: InstanceOfFoo,
-        bar: InstanceOfBar,
-        ...
-    };
+        var modules = {
+            foo: InstanceOfFoo,
+            bar: InstanceOfBar,
+            ...
+        };
 
 2. Initialise them all this way:
 
-    ecosystem.initAll(config, modules, function() {
-        // this will be called when all modules have been initialised
-    });
+        ecosystem.initAll(config, modules, function() {
+            // this will be called when all modules have been initialised
+        });
 
 3. Start them all
 
-        ecosystem.startAll(modules, function() {
-            // this will be called when all modules
-            // have been successfully started
-        });
+            ecosystem.startAll(modules, function() {
+                // this will be called when all modules
+                // have been successfully started
+            });
 
 4. Stop them when you're done
-            ecosystem.stopAll(modules, function() {
-                // This will be called when all
-                // modules have been stopped.
-            });
+                ecosystem.stopAll(modules, function() {
+                    // This will be called when all
+                    // modules have been stopped.
+                });
 
 So all together:
 
