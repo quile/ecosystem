@@ -67,7 +67,7 @@ You must call next() or the stop call-chain will terminate.
 
 ## Quick 'n' Dirty
 
-1. Build a dictionary of name-to-component mappings:
+Build a dictionary of name-to-component mappings:
 
 ```javascript
         var modules = {
@@ -77,7 +77,7 @@ You must call next() or the stop call-chain will terminate.
         };
 ```
 
-2. Initialise them all this way:
+Initialise them all this way:
 
 ```javascript
         ecosystem.initAll(config, modules, function() {
@@ -85,7 +85,7 @@ You must call next() or the stop call-chain will terminate.
         });
 ```
 
-3. Start them all
+Start them all
 
 ```javascript
             ecosystem.startAll(modules, function() {
@@ -94,7 +94,7 @@ You must call next() or the stop call-chain will terminate.
             });
 ```
 
-4. Stop them when you're done
+Stop them when you're done
 
 ```javascript
                 ecosystem.stopAll(modules, function() {
