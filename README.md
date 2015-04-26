@@ -28,12 +28,16 @@ lifecycle methods.
     var Lifecycle = require("ecosystem").Lifecycle;
     var util      = require("util");
 
+    // You need a constructor that calls the Lifecycle constructor
     function MyService(name) {
         Lifecycle.call(this, name);
     }
+    // ... and you need to inherit from Lifecycle
     util.inherits(MyService, Lifecycle);
     ...
 
+    // ... and if you export your class as "Lifecycle", ecosystem
+    // will know how to init/start/stop it easily
     module.exports = {
         Lifecycle: MyService,
         ...
@@ -106,11 +110,78 @@ Note that the config should only be passed into the initAll()
 function; modules can take what they need from the config during
 initialisation.
 
+## Real-World Example
+### A MySQL service
+
+Here's an example MySQL service that other modules can declare as a dependency.
+Then all dependent modules can be assured that when their start() method is called,
+this service's start() method has already been called.
+
+    var mysql = require('mysql');
+    var util  = require('util');
+
+    var Lifecycle = require('ecosystem').Lifecycle;
+
+    // Construct the service
+    function MySQL(name) {
+        Lifecycle.call(this, name);
+        this._connection = null;
+    }
+
+    util.inherits(MySQL, Lifecycle);
+
+    // Your service can optionally implement any of these
+    // lifecycle methods:
+    //
+    // * init(config, modules, next)
+    // * start(next)
+    // * stop(next)
+
+    _.extend(MySQL.prototype, {
+
+        // init is guaranteed to be called before the init() of any
+        // modules that depend on this module.
+        init: function(config, modules, next) {
+            this._connection = mysql.createConnection(config.mysql);
+            next();
+        },
+
+        // start is guaranteed to be called before the start() of
+        // any modules that depend on this module; this means that
+        // a dependent module can assume that the MySQL connection
+        // will be alive and can use it within the start() method.
+        start: function(next) {
+            var that = this;
+
+            this._connection.connect(function(err) {
+                if (err) {
+                    log.error(err);
+                    throw new Error(err);
+                }
+                console.log("MySQL connected.");
+                next();
+            });
+        },
+
+        stop: function(next) {
+            this._connection.end(function(err) {
+                console.log("MySQL connection closed.");
+                next();
+            });
+        },
+
+        ... your own methods here to talk to the service,
+        ... run queries, etc. etc.
+    });
+
+    module.exports = {
+        Lifecycle: MySQL
+    };
+
 
 ## TODO
 
 * Write some decent documentation
-* Show some real-world examples
 
 ## Acknowledgements
 
