@@ -59,10 +59,57 @@ next() function in order for the start call-chain to continue.
 that a service will only be stopped after all its dependencies are stopped.
 You must call next() or the stop call-chain will terminate.
 
+## Quick 'n' Dirty
+
+1. Build a dictionary of name-to-component mappings:
+
+    var modules = {
+        foo: InstanceOfFoo,
+        bar: InstanceOfBar,
+        ...
+    };
+
+2. Initialise them all this way:
+
+    ecosystem.initAll(config, modules, function() {
+        // this will be called when all modules have been initialised
+    });
+
+3. Start them all
+
+        ecosystem.startAll(modules, function() {
+            // this will be called when all modules
+            // have been successfully started
+        });
+
+4. Stop them when you're done
+            ecosystem.stopAll(modules, function() {
+                // This will be called when all
+                // modules have been stopped.
+            });
+
+So all together:
+
+    ecosystem.initAll(config, modules, function() {
+        // this will be called when all modules have been initialised
+        ecosystem.startAll(modules, function() {
+            // this will be called when all modules
+            // have been successfully started
+            ecosystem.stopAll(modules, function() {
+                // This will be called when all
+                // modules have been stopped.
+            });
+        });
+    });
+
+Note that the config should only be passed into the initAll()
+function; modules can take what they need from the config during
+initialisation.
+
+
 ## TODO
 
 * Write some decent documentation
-* Build a simpler way to kick off the modules, rather than having to call _init by hand.
 * Show some real-world examples
 
 ## Acknowledgements
