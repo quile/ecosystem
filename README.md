@@ -201,7 +201,7 @@ Now you can use this service from your other code:
     var _         = require("underscore");
     var util      = require("util");
     var Lifecycle = require("ecosystem").Lifecycle;
-    
+
     function FooService(name) {
         Lifecycle.call(this, name);
         ...
@@ -212,7 +212,11 @@ Now you can use this service from your other code:
     _.extend(FooService.prototype, {
 
         dependencies: function() {
-            return [ "mysql" ];
+            // if you use loadAll() to load dependencies, you declare
+            // them using the path that they were "require"d with.
+            // Otherwise, you just use the name that they were constructed
+            // with.
+            return [ "./mysql", "./something-else",  ];
         },
 
         init: function(config, modules, next) {
